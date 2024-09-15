@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Model Evaluation Results</h1>
+
+        <!-- Display result message, e.g., completion status -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <p class="text-lg">{{ result_message }}</p>
+        </div>
+
+        <!-- ARIMA Forecast Plot -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">ARIMA Forecast</h2>
+            {% if arima_plot %}
+                <img src="data:image/png;base64,{{ arima_plot }}" alt="ARIMA Forecast" class="w-full h-auto rounded-lg">
+            {% else %}
+                <p class="text-gray-600">ARIMA plot is not available.</p>
+            {% endif %}
+        </div>
+
+        <!-- LSTM Forecast Plot -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">LSTM Forecast</h2>
+            {% if lstm_plot %}
+                <img src="data:image/png;base64,{{ lstm_plot }}" alt="LSTM Forecast" class="w-full h-auto rounded-lg">
+            {% else %}
+                <p class="text-gray-600">LSTM plot is not available.</p>
+            {% endif %}
+        </div>
+
+        <!-- K-Means Clustering Plot -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">K-Means Clustering</h2>
+            {% if cluster_plot %}
+                <img src="data:image/png;base64,{{ cluster_plot }}" alt="K-Means Clustering" class="w-full h-auto rounded-lg">
+            {% else %}
+                <p class="text-gray-600">K-Means clustering plot is not available.</p>
+            {% endif %}
+        </div>
+
+        <!-- PCA Plot (Conditionally displayed) -->
+        {% if pca_plot %}
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">PCA of Data</h2>
+            <img src="data:image/png;base64,{{ pca_plot }}" alt="PCA of Data" class="w-full h-auto rounded-lg">
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

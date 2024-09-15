@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Trend Based On Time Series Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Market Trend Based On Time Series Analysis</h1>
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Generate Data</h2>
+            <button id="generateData" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Generate Sample Data</button>
+            <p id="dataFilePath" class="mt-4"></p>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Upload Data</h2>
+            <input type="file" id="fileUpload" class="mb-4"/>
+            <button id="uploadFile" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Upload File</button>
+            <p id="uploadStatus" class="mt-4"></p>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Train Models</h2>
+            <button id="trainModels" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Train Models</button>
+            <p id="trainingStatus" class="mt-4"></p>
+        </div>
+        <div id="results" class="hidden bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">Model Evaluation Results</h2>
+            <p id="resultMessage" class="text-lg"></p>
+            <div id="arimaPlot" class="mt-4">
+                <h3 class="text-xl font-semibold">ARIMA Forecast</h3>
+                <img id="arimaImage" src="" alt="ARIMA Forecast" class="w-full h-auto rounded-lg">
+            </div>
+            <div id="lstmPlot" class="mt-4">
+                <h3 class="text-xl font-semibold">LSTM Forecast</h3>
+                <img id="lstmImage" src="" alt="LSTM Forecast" class="w-full h-auto rounded-lg">
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('generateData').addEventListener('click', () => {
+            fetch('/generate_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('dataFilePath').textContent = 'Generated Data File: ' + data.file_path;
+                });
+        });
+
+        document.getElementById('uploadFile').addEventListener('click', () => {
+            const fileInput = document.getElementById('fileUpload');
+            if (fileInput.files.length === 0) {
+                alert('Please select a file.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('uploadStatus').textContent = 'Uploaded File Path: ' + data.file_path;
+            })
+            .catch(error => console.error('Error uploading file:', error));
+        });
+
+        document.getElementById('trainModels').addEventListener('click', () => {
+            const filePath = document.getElementById('dataFilePath').textContent.split(' ').pop();
+            if (!filePath) {
+                alert('Please generate or upload data first.');
+                return;
+            }
+            fetch('/train_models', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ file_path: filePath })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('resultMessage').textContent = 'Training complete!';
+                document.getElementById('arimaImage').src = 'data:image/png;base64,' + data.arima_plot;
+                document.getElementById('lstmImage').src = 'data:image/png;base64,' + data.lstm_plot;
+                document.getElementById('arimaPlot').style.display = data.arima_plot ? 'block' : 'none';
+                document.getElementById('lstmPlot').style.display = data.lstm_plot ? 'block' : 'none';
+            })
+            .catch(error => console.error('Error training models:', error));
+        });
+    </script>
+</body>
+</html>
